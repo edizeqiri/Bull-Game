@@ -10,7 +10,7 @@ void UBullCowCartridge::BeginPlay() // When the game starts
     PrintLine(TEXT("Press Enter to Play!"));
 
     // Setting up the Game
-    InitGame();
+    SetupGame();
     
 
 }
@@ -33,7 +33,7 @@ void UBullCowCartridge::OnInput(const FString& Input) // When the player hits en
     }
 }
 
-void UBullCowCartridge::InitGame()
+void UBullCowCartridge::SetupGame()
 {
     HiddenWord = TEXT("head");
     Lives = 3;
