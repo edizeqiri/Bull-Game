@@ -15,6 +15,7 @@ void UBullCowCartridge::OnInput(const FString& Input) // When the player hits en
 	/* if game is over do CLeanScreen and SetupGame()
 	 else check Player Guess*/
 
+
 	if (bGameOver)
 	{
 		ClearScreen();
@@ -22,21 +23,7 @@ void UBullCowCartridge::OnInput(const FString& Input) // When the player hits en
 	}
 	else
 	{
-		if (Input == HiddenWord)
-		{
-			PrintLine(TEXT("You Won!"));
-			EndGame();
-		}
-		else
-		{
-			if (HiddenWord.Len() != Input.Len())
-			{
-				PrintLine(TEXT("The Hidden Word is %i characters long. You have lost!"), HiddenWord.Len());
-				EndGame();
-			}
-			PrintLine(TEXT("Try again!"));
-			// Remove Live
-		}
+		ProcessGuess(Input, Lives);
 	}
 }
 
@@ -46,9 +33,10 @@ void UBullCowCartridge::SetupGame()
 	PrintLine(TEXT("Welcome to Bulls Game!"));
 
 	HiddenWord = TEXT("head");
-	Lives = 3;
+	Lives = HiddenWord.Len();
 
 	PrintLine(TEXT("Guess the %i letter word!"), HiddenWord.Len());
+	PrintLine(TEXT("You have %i lives!"), Lives);
 	PrintLine(TEXT("Type in your guess.\nPress Enter to Play!"));
 	bGameOver = false;
 }
@@ -56,5 +44,56 @@ void UBullCowCartridge::SetupGame()
 void UBullCowCartridge::EndGame()
 {
 	bGameOver = true;
-	PrintLine(TEXT("Press Enter to play again!"));
+
+	PrintLine(TEXT("\nPress Enter to play again!"));
+}
+
+void UBullCowCartridge::ProcessGuess(const FString Guess, int32 Counter)
+{
+	if (Guess == HiddenWord)
+	{
+		PrintLine(TEXT("You Won!"));
+		EndGame();
+		return;
+	}
+
+
+	if (HiddenWord.Len() != Guess.Len())
+	{
+		PrintLine(TEXT("The Hidden Word is %i characters long. Try again!"), HiddenWord.Len());
+		return;
+	}
+
+	if (!IsIsogram(Guess))
+	{
+		PrintLine(TEXT("No repeating letters, try again!"));
+		return;
+	}
+
+	--Lives;
+
+	PrintLine(TEXT("You have %i lives remaining. Try again!"), Lives);
+	if (!(Lives > 0))
+	{
+		ClearScreen();
+		PrintLine(TEXT("You have no lives left!"));
+		PrintLine(TEXT("The hidden word was: %s"), *HiddenWord);
+		EndGame();
+		return;
+	}
+}
+
+bool UBullCowCartridge::IsIsogram(FString Word) const
+{
+	for (int32 i = 0; i < Word.Len(); i++)
+	{
+		for (int32 j = i+1; j < Word.Len(); j++)
+		{
+			if (Word[i] == Word[j])
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 }
